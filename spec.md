@@ -305,8 +305,8 @@ Example error response (missing authorization):
 
 ### Update Space operation
 
-* Requires appropriate authorization (root zcap invoked by the space's controller,
-  or a zcap granting permission to write to a particular space)
+* Requires appropriate authorization (root zcap invoked by the space's
+  controller, or a zcap granting permission to write to a particular space)
 * Allows to update the following fields:
   - `name`
   - `controller`
@@ -350,8 +350,8 @@ the space `id`):
 
 ### Delete Space operation
 
-* Requires appropriate authorization (root zcap invoked by the space's controller,
-  or a zcap granting permission to write to a particular space)
+* Requires appropriate authorization (root zcap invoked by the space's
+  controller, or a zcap granting permission to write to a particular space)
 * Deletes the space and all of the data (collections and resources) contained
   in it
 * This operation is idempotent
@@ -397,6 +397,33 @@ Example error response (invalid `id` provided):
 ### Blob Data Model
 
 ### Resource Data Model
+
+A resource is a named (addressable) blob stored in a Space, with metadata.
+The data model is derived from w3c FileAPI: File Interface, but with the
+addition of a few crucial properties.
+
+In similar storage systems, a resource is called "File", "Object", "Document",
+"Row", "Graph", "RDF Dataset", and so on.
+
+Resource properties:
+
+* `id`
+* `contents` (Blob)
+* `name` - optional
+* (tbd) a link to a **system-meta** auxiliary object (determined by the local
+  system)
+* (tbd) one or more links to **custom-meta** auxiliary objects (unlike
+  system-meta, these are modifiable by the object's controller)
+
+Example **system-meta** properties (not directly modifiable, controlled by the
+system):
+
+- contents size (in bytes)
+- total size in bytes (contents + metadata)
+- created timestamp (optional)
+- updated timestamp (optional)
+- last accessed timestamp (optional)
+- creator (optional) - id of the agent that created this resource
 
 ### Resource Operations
 
