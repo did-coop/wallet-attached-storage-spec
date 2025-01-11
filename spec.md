@@ -149,8 +149,39 @@ trusted storage servers is required.
 
 ## Terminology
 
+This specification uses the terms ... defined by []
+
 <dl class="termlist definitions" data-sort="ascending">
+  <dt><dfn data-lt="entities|entity's">entity</dfn></dt>
+  <dd>
+A thing with distinct and independent existence, such as a person,
+organization, or device that performs one or more roles in the ecosystem.
+(As defined in [OpenID Connect 1.0](https://openid.net/specs/openid-connect-core-1_0.html#Terminology).)
+  </dd>
+
+  <dt><dfn data-lt="">  </dfn></dt>
+  <dd>
+  </dd>
+
 </dl>
+
+from HTTPSig:
+For brevity, the term "signature" refers to the output of an asymmetric cryptographic
+signing operation. Similarly, the verb "sign" refers to the generation of a signature over
+a given signature base.
+
+from OIDC:
+Identifier
+Value that uniquely characterizes an Entity in a specific context.
+
+from OAuth2 
+
+client
+An application making protected resource requests on behalf of the
+resource owner and with its authorization.  The term "client" does
+not imply any particular implementation characteristics (e.g.,
+whether the application executes on a server, a desktop, or other
+devices).
 
 ## Authorization
 
