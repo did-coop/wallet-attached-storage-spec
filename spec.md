@@ -494,10 +494,9 @@ Location: https://example.com/space/81246131-69a4-45ab-9bff-9c946b59cf2e/message
 #### (HTTP API) GET `/spaces/{space_id}/{collection/*}{resource_name}`
 
 * Requires appropriate authorization
-    - For example, when using [zCAPs](#zcap) for authorization, the request
-      must either: be signed by the resource's or the space's [=controller=],
-      or invoke a delegated capability that allows the [`GET`
-      action](#get-action).
+  - For example, when using [zCAPs](#zcap) for authorization, the request
+    must either: be signed by the resource's or the space's [=controller=],
+    or invoke a delegated capability that allows the [`GET` action](#get-action)
 
 Example request to retrieve a resource:
 
@@ -572,9 +571,13 @@ Location: https://example.com/space/81246131-69a4-45ab-9bff-9c946b59cf2e/message
 #### (HTTP API) DELETE `/spaces/{space_id}/{collection/*}{resource_name}`
 
 * Requires appropriate authorization
-  - Invoking this method via [ZCAP](#zcap) requires a capability allowing the
-    [`DELETE` action](#delete-action) on the appropriate resource.
+  - For example, when using [zCAPs](#zcap) for authorization, the request
+    must either: be signed by the resource's or the space's [=controller=],
+    or invoke a delegated capability that allows the
+    [`DELETE` action](#delete-action)
+
 * This operation is idempotent
+
 * (Assuming the request carries appropriate authorization) Sending a DELETE
   request to a resource that does not exist (or has already been deleted)
   results in a 204 success response
