@@ -494,8 +494,10 @@ Location: https://example.com/space/81246131-69a4-45ab-9bff-9c946b59cf2e/message
 #### (HTTP API) GET `/spaces/{space_id}/{collection/*}{resource_name}`
 
 * Requires appropriate authorization
-    - Invoking this method via [ZCAP](#zcap) requires a capability allowing the
-      [`GET` action](#get-action).
+    - For example, when using [zCAPs](#zcap) for authorization, the request
+      must either: be signed by the resource's or the space's [=controller=],
+      or invoke a delegated capability that allows the [`GET`
+      action](#get-action).
 
 Example request to retrieve a resource:
 
