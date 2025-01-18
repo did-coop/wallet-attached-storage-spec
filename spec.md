@@ -571,7 +571,7 @@ Location: https://example.com/space/81246131-69a4-45ab-9bff-9c946b59cf2e/message
 
 * Requires appropriate authorization
   - Invoking this method via [ZCAP](#zcap) requires a capability allowing the
-    [`DELETE` action](#put-action) on the appropriate resource.
+    [`DELETE` action](#delete-action) on the appropriate resource.
 * This operation is idempotent
 * (Assuming the request carries appropriate authorization) Sending a DELETE
   request to a resource that does not exist (or has already been deleted)
