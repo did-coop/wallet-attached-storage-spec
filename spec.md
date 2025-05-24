@@ -173,6 +173,164 @@ minimally trusted storage servers is required.
 
 ## Authorization
 
+The ability to do cross-domain, operator-independent, standardized cloud storage
+operations requires an authorization system that is:
+
+* Modular and layered (for future agility / upgradability)
+* Not limited to traditional domain-based "usernames and passwords"
+* A hybrid, using object capability principles at its baseline, but also able
+  to provide ACL or RBAC-like functionality for user convenience. In other words,
+  the system needs to support both "anyone with the link can..." and "these are
+  specific people and groups allowed to..." styles of access control
+* Compatible with cross-domain replication
+* Compatible with end-to-end client side encryption (but also not rely on
+  encryption as the sole authorization method)
+* "Private by default".
+  That is, by default, unless otherwise specified, only the controller of a
+  space (or of a collection or resource) is authorized to perform any operation
+  (read, write, delete, etc)
+
+As the state of the art in cross-domain authorization advances, we expect there
+to be multiple profiles and specs that could be used to perform WAS API
+calls. However, to start with, this specification will focus on a single minimal
+authorization profile.
+
+## WAS Authorization Profile v0.1
+
+Like many authorization specifications, the W.A.S. Authorization Profile tries
+to address opposing tensions. On the one hand, to cover the full range of use
+cases, it needs to be delegatable, revocable, secure, flexible, and thus
+capability based. On the other hand, for ease of implementation and adoption,
+and for maximum developer usability, the profile must make the most common
+operations as simple and friction free as possible.
+
+To that end, the profile offers the following layered mechanisms.
+
+1. **Root Access**: For basic admin CRUD operations, use the space's `controller`
+   DID directly to sign API calls with HTTP Signatures.
+2. **Public Read**: For the common "public read" use case (the typical web
+   publishing workflow, where a site or a file is shared for anyone to access
+   via an HTTP GET), use the simple `publicRead: true` WAS Authorization syntax,
+   see below.
+3. **Advanced Delegatable Capabilities** ("anyone with the link..." style):
+   Use zCaps [Authorization Capabilities v0.3](https://w3c-ccg.github.io/zcap-spec/)
+4. **Policy Based Access Control** (including the familiar "share with this list
+   of people or groups" style): Use the space's `link` property to point to
+   a linkset that includes a URL to an access control policy document.
+
+### Authorization Specification Dependencies at a Glance
+
+The initial W.A.S. Authorization Profile uses the following specifications.
+
+1. Identity (for controllers or clients/agents): [DID 1.0](https://www.w3.org/TR/did-1.0/)
+2. Capability data model: [Authorization Capabilities for Linked Data v0.3](https://w3c-ccg.github.io/zcap-spec/)
+3. Protocol for obtaining authorization: Out of scope (implementers are encouraged
+   to use VC-API, OpenId4VP, OAuth2, or GNAP, as appropriate)
+4. Proof of Possession / authorization invocation: HTTP Signatures.
+   MUST - [RFC 9421 HTTP Message Signatures](https://www.rfc-editor.org/rfc/rfc9421.html),
+   MAY - [HTTP Signatures (Cavage draft 12)](https://datatracker.ietf.org/doc/html/draft-cavage-http-signatures)
+5. Access Control / Policy language data model: TBD (see <#16>)
+
+### Space `controller` and the Root of Trust
+
+Space `controller`s MUST be in the form of a [DID](https://www.w3.org/TR/did-1.0/).
+
+For minimal compatibility, all WAS implementations MUST support the
+[`did:key` DID Method](https://w3c-ccg.github.io/did-key-spec/), using the
+Multikey encoding of `Ed25519` elliptic curve keys, as specified in the
+[Multikey section of the CID spec](https://www.w3.org/TR/cid-1.0/#Multikey)
+as the space `controller`.
+
+When a space is created via an HTTP [POST](#http-api-post-spaces) or
+[PUT](#http-api-put-space-space_id) operation, the controller for that space
+is set, either implicitly or explicitly. 
+
+Implicitly, if no `controller` is specified in the PUT or POST create space
+request, the server MUST determine and set the `controller` from the corresponding
+authorization headers of the request (for example, from the `Authorization` header
+when using HTTP Signatures).
+
+Explicitly, if a client specifies the `controller` as part of the payload
+of the PUT or POST create space request, the server MUST check that the methods
+(key IDs) used in the headers are authorized in the `capabilityInvocation`
+section of the `controller`'s DID document.
+
+See below in the [HTTP POST](#http-api-post-spaces) sections for examples of
+`controller` determination and verification.
+
+Conceptually, the space's controller serves as the root of trust and authorization
+for any operations on the space or its collections or resources.
+That is, any operation requiring an authorization MUST provide a chain of proof
+all the way to the space controller, by one of the following:
+
+1. Direct: Provide a root capability invoked directly by the controller, or
+2. Delegated: Invoke a capability delegated to some other agent by the controller, or
+3. Matching Policy: (if using any kind of access control policy mechanism) Match
+   an authorization policy specified in the `link` property of the space. This
+   resource is related to the space controller because initially, it can only be
+   modified either by the controller or an authorized party delegated to by the
+   controller.
+
+### Performing Authorized API Calls
+
+Unless otherwise explicitly allowed via access control policy (see below),
+all W.A.S. API calls require authorization.
+
+This can be done in one of two ways:
+
+1. (for admin-like root access) Use the `controller` DID directly to sign
+   HTTP API requests using the HTTP Signatures specification.
+2. (for advanced delegatable use cases) Use HTTP Signatures in combination
+   with [Authorization Capabilities v0.3](https://w3c-ccg.github.io/zcap-spec/),
+   and include a capability invocation header in the API request.
+
+### Specifying Access Policy With Space Link Sets
+
+To set access control policy for a space, use the `link` property.
+
+Example (fetching a space's link set):
+
+```http
+GET /space/81246131-69a4-45ab-9bff-9c946b59cf2e/links HTTP/1.1
+Host: example.com
+Accept: application/linkset+json
+Authorization: Signature keyId="did:key:z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW#z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW" ...
+```
+
+Response:
+
+```http
+HTTP/1.1 200 OK
+Content-type: application/linkset+json
+
+{
+  "linkset": [
+    {
+      "anchor": "/space/81246131-69a4-45ab-9bff-9c946b59cf2e/",
+      "acl": [
+        "href": "/space/81246131-69a4-45ab-9bff-9c946b59cf2e/acl",
+        "media": "application/json; profile=\"was authz profile v0.1\""
+      ]
+    }
+  ]
+}
+```
+
+Example (fetching a specific policy document from the link set):
+
+```http
+GET /space/81246131-69a4-45ab-9bff-9c946b59cf2e/acl HTTP/1.1
+Host: example.com
+Authorization: Signature keyId="did:key:z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW#z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW" ...
+```
+
+```http
+HTTP/1.1 200 OK
+Content-type: application/json; profile="was authz profile v0.1"
+
+{ publicRead: true }
+```
+
 ## Spaces
 
 ### Space Data Model
@@ -183,9 +341,12 @@ minimally trusted storage servers is required.
 * `type` - A sorted array of strings, MUST include the type `Space`.
 * `name` (optional) - An arbitrary human-readable name for the space. Does not
   have to be unique.
-* `controller` - Determined by server based on who creates the space originally.
-
-#### Space JSON Representation
+* `controller` - A cryptographic identifier (a [DID](https://www.w3.org/TR/did-1.0/)) 
+  of the entity that is authorized to perform operations on the space (or to
+  delegate authorization to other entities)
+* `link` (optional) - A URL (relative or absolute) to a resource which contains
+  a set of links to auxiliary resources (such as to access control policy
+  documents)
 
 ### Create Space operation
 
@@ -193,8 +354,10 @@ To create a Space:
 
 * Perform an authenticated Create Space operation that includes a Proof of
   (cryptographic material) Possession via a mechanism such as HTTP Signatures.
+
 * The signing DID (from the proof of possession signature) is set as the 
-  Space's `controller`
+  Space's `controller`. See the [Space `controller` and the Root of 
+  Trust](#space-controller-and-the-root-of-trust) section for more details)
 
 * If an `id` is provided in the Create Space request, it must start with `urn:uuid`.
   If no `id` is provided, it will be generated by the storage server.
@@ -236,6 +399,14 @@ Location: https://example.com/space/81246131-69a4-45ab-9bff-9c946b59cf2e
 }
 ```
 
+Note that in the example above:
+
+* the `id` was not specified in the body of the request, and so was generated by
+  the server and returned in the response
+* the `controller` was not specified in the body of the request, it was determined
+  by the server (based on the Key ID in the `Authorization` header's HTTP 
+  Signature)
+
 Example error response (missing Proof of Possession signature, unable to 
 determine controller):
 
@@ -274,7 +445,8 @@ Content-type: application/json
   "id": "81246131-69a4-45ab-9bff-9c946b59cf2e",
   "type": ["Space"],
   "name": "Example space #1",
-  "controller": "did:key:z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW"
+  "controller": "did:key:z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW",
+  "link": "/space/81246131-69a4-45ab-9bff-9c946b59cf2e/links"
 }
 ```
 
@@ -327,6 +499,7 @@ Example error response (missing authorization):
 * Allows to update the following fields:
   - `name`
   - `controller`
+  - `link`
 
 #### (HTTP API) PUT `/space/{space_id}`
 
@@ -336,7 +509,7 @@ may be omitted from the request payload.
 
 Note that this operation is idempotent.
 
-Example request (updating the name of a space):
+Example request (updating the `name` and `link` properties of a space):
 
 ```http
 PUT /space/81246131-69a4-45ab-9bff-9c946b59cf2e HTTP/1.1
@@ -348,7 +521,8 @@ Authorization: ...
 {
   "id": "81246131-69a4-45ab-9bff-9c946b59cf2e",
   "name": "Newly renamed space #1",
-  "controller": "did:key:z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW"
+  "controller": "did:key:z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW",
+  "link": "/space/81246131-69a4-45ab-9bff-9c946b59cf2e/links"
 }
 ```
 
