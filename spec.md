@@ -678,7 +678,6 @@ Content-Type: application/json
 Authorization: ...
 
 {
-  "id": "73WakrfVbNJBaAmhQtEeDv",
   "name": "Verifiable Credentials Collection",
   "type": ["Collection"]
 }
@@ -710,7 +709,6 @@ HTTP/1.1 200 OK
 Content-type: application/json
 
 {
-  "id": "73WakrfVbNJBaAmhQtEeDv",
   "name": "Verifiable Credentials Collection",
   "type": ["Collection"],
   "totalItems": 0,
