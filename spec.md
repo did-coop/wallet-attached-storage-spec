@@ -478,7 +478,6 @@ Example error response (a space with the specified `id` already exists):
 * Requires appropriate authorization (root zcap invoked by the space's controller,
   or a zcap granting permission to read a particular space)
 * Returns the details for the specified space `id`
-* Only includes the resources the requester is authorized to see
 
 The format of the response is determined based on content negotiation.
 
@@ -514,7 +513,6 @@ Example success response (resources have been added to the space):
 * Contents listed in a format inspired by [ActivityStreams 2](https://www.w3.org/TR/activitystreams-core/#collections)
   Collections
 * No pagination used
-* The requester is authorized to see two of these items
 
 ```http
 HTTP/1.1 200 OK
