@@ -652,11 +652,10 @@ Collection properties:
 
 #### Collection JSON Representation (Activity Streams 2 profile)
 
-Example empty collection, in AS2 format:
+Example empty collection:
 
 ```json
 {
-  "id": "73WakrfVbNJBaAmhQtEeDv",
   "name": "Verifiable Credentials Collection",
   "type": ["Collection"],
   "totalItems": 0,
@@ -664,8 +663,8 @@ Example empty collection, in AS2 format:
 }
 ```
 
-Note that the `totalItems` and `items` properties are specific to the AS2 representation,
-and are not directly editable by the user (are instead controlled by the server).
+Note that the `totalItems` and `items` properties are not directly editable by
+the user (are instead controlled by the server).
 
 ### Create or Update Collection operation
 
@@ -693,7 +692,7 @@ HTTP/1.1 201 Created
 
 #### (HTTP API) GET `/space/{space_id}/{collection_id}/`
 
-Example request (getting a collection by its id), in ActivityStreams 2 format:
+Example request (getting a collection by its id):
 
 ```http
 GET /space/81246131-69a4-45ab-9bff-9c946b59cf2e/73WakrfVbNJBaAmhQtEeDv/ HTTP/1.1
