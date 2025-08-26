@@ -674,7 +674,7 @@ and are not directly editable by the user (are instead controlled by the server)
 ```http
 PUT /space/81246131-69a4-45ab-9bff-9c946b59cf2e/73WakrfVbNJBaAmhQtEeDv/ HTTP/1.1
 Host: example.com
-Content-Type: application/activity+json
+Content-Type: application/json
 Authorization: ...
 
 {
@@ -699,7 +699,7 @@ Example request (getting a collection by its id), in ActivityStreams 2 format:
 ```http
 GET /space/81246131-69a4-45ab-9bff-9c946b59cf2e/73WakrfVbNJBaAmhQtEeDv/ HTTP/1.1
 Host: example.com
-Accept: application/activity+json
+Accept: application/json
 Authorization: ...
 ```
 
@@ -707,7 +707,7 @@ Example response:
 
 ```http
 HTTP/1.1 200 OK
-Content-type: application/activity+json
+Content-type: application/json
 
 {
   "id": "73WakrfVbNJBaAmhQtEeDv",
