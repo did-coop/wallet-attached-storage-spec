@@ -1,0 +1,11 @@
+{
+  "name": "wallet-attached-storage-spec",
+  "version": "0.0.1",
+  "description": "Wallet Attached Storage specification (ReSpec format)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
