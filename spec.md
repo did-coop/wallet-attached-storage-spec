@@ -483,14 +483,16 @@ The format of the response is determined based on content negotiation.
 
 #### (HTTP API) GET `/space/{space_id}`
 
-Example request:
+Example request (that lists the contents of the default space collection):
 
 ```http
-GET /space/81246131-69a4-45ab-9bff-9c946b59cf2e HTTP/1.1
+GET /space/81246131-69a4-45ab-9bff-9c946b59cf2e/ HTTP/1.1
 Host: example.com
 Accept: application/json
 Authorization: Signature keyId="did:key:z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW#z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW" ...
 ```
+
+Note the trailing `/`
 
 Example success response (the space is empty of contents):
 
