@@ -486,7 +486,7 @@ The format of the response is determined based on content negotiation.
 Example request (that lists the contents of the default space collection):
 
 ```http
-GET /space/81246131-69a4-45ab-9bff-9c946b59cf2e/ HTTP/1.1
+GET /space/81246131-69a4-45ab-9bff-9c946b59cf2e HTTP/1.1
 Host: example.com
 Accept: application/json
 Authorization: Signature keyId="did:key:z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW#z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW" ...
@@ -544,7 +544,7 @@ authorization as it would for a missing/not found space.
 ```http
 HTTP/1.1 404 Not Found
 Content-type: application/problem+json
-Content-Language: en
+
 {
   "type": "https://wallet.storage/spec#read-space-errors",
   "title": "Space not found or insufficient authorization."
@@ -556,7 +556,7 @@ Example error response (space id not found):
 ```http
 HTTP/1.1 404 Not Found
 Content-type: application/problem+json
-Content-Language: en
+
 {
   "type": "https://wallet.storage/spec#read-space-errors",
   "title": "Space not found or insufficient authorization."
