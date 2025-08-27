@@ -416,7 +416,6 @@ Example error response (missing `controller` property):
 ```http
 HTTP/1.1 400 Bad Request
 Content-type: application/problem+json
-Content-Language: en
 
 {
   "type": "https://wallet.storage/spec#create-space-errors",
@@ -435,7 +434,6 @@ Example error response (missing Proof of Possession signature):
 ```http
 HTTP/1.1 401 Unauthorized
 Content-type: application/problem+json
-Content-Language: en
 
 {
   "type": "https://wallet.storage/spec#create-space-errors",
@@ -454,7 +452,6 @@ header does not match the DID specified in the `controller`):
 ```http
 HTTP/1.1 403 Forbidden
 Content-type: application/problem+json
-Content-Language: en
 
 {
   "type": "https://wallet.storage/spec#create-space-errors",
@@ -479,11 +476,12 @@ Example error response (a space with the specified `id` already exists):
   or a zcap granting permission to read a particular space)
 * Returns the details for the specified space `id`
 
-The format of the response is determined based on content negotiation.
-
 #### (HTTP API) GET `/space/{space_id}`
 
-Example request (that lists the contents of the default space collection):
+Returns the properties of a given space, _without_ the contents of the default
+(`/`) collection. Note the lack of a trailing `/` in the GET url.
+
+Example request:
 
 ```http
 GET /space/81246131-69a4-45ab-9bff-9c946b59cf2e HTTP/1.1
@@ -492,9 +490,7 @@ Accept: application/json
 Authorization: Signature keyId="did:key:z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW#z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW" ...
 ```
 
-Note the trailing `/`
-
-Example success response (the space is empty of contents):
+Example success response:
 
 ```http
 HTTP/1.1 200 OK
@@ -505,32 +501,7 @@ Content-type: application/json
   "type": ["Space"],
   "name": "Example space #1",
   "controller": "did:key:z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW",
-  "linkset": "/space/81246131-69a4-45ab-9bff-9c946b59cf2e/linkset",
-  "totalItems": 0
-}
-```
-
-Example success response (resources have been added to the space):
-
-* Contents listed in a format inspired by [ActivityStreams 2](https://www.w3.org/TR/activitystreams-core/#collections)
-  Collections
-* No pagination used
-
-```http
-HTTP/1.1 200 OK
-Content-type: application/json
-
-{
-  "id": "81246131-69a4-45ab-9bff-9c946b59cf2e",
-  "type": ["Space"],
-  "name": "Example space #1",
-  "controller": "did:key:z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW",
-  "linkset": "/space/81246131-69a4-45ab-9bff-9c946b59cf2e/linkset",
-  "totalItems": 2,
-  "items": [
-    { "id": "https://example.com/space/81246131-69a4-45ab-9bff-9c946b59cf2e/10f6672d-7a24-486b-9622-691007ded846" },
-    { "id": "https://example.com/space/81246131-69a4-45ab-9bff-9c946b59cf2e/b42ec4d8-6ead-486d-b70a-c25d2ce4dfc7" }
-  ]
+  "linkset": "/space/81246131-69a4-45ab-9bff-9c946b59cf2e/linkset"
 }
 ```
 
@@ -551,7 +522,60 @@ Example error response (space id not found):
 HTTP/1.1 404 Not Found
 ```
 
+### List Contents of the Default `/` Space Collection
+
+This lists the items in the space's default `/` collection. Note the trailing
+slash.
+
+Example request:
+
+```http
+GET /space/81246131-69a4-45ab-9bff-9c946b59cf2e/ HTTP/1.1
+Host: example.com
+Accept: application/json
+Authorization: Signature keyId="did:key:z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW#z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW" ...
+```
+
+Example success response (the collection is empty of contents):
+
+```http
+HTTP/1.1 200 OK
+Content-type: application/json
+
+{
+  "type": ["Collection"],
+  "controller": "did:key:z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW",
+  "linkset": "/space/81246131-69a4-45ab-9bff-9c946b59cf2e/linkset",
+  "totalItems": 0
+}
+```
+
+Example success response (resources have been added to the space):
+
+* Contents listed in a format inspired by [ActivityStreams 2](https://www.w3.org/TR/activitystreams-core/#collections)
+  Collections
+* No pagination used
+
+```http
+HTTP/1.1 200 OK
+Content-type: application/json
+
+{
+  "type": ["Collection"],
+  "name": "Example space #1",
+  "controller": "did:key:z6MkpBMbMaRSv5nsgifRAwEKvHHoiKDMhiAHShTFNmkJNdVW",
+  "linkset": "/space/81246131-69a4-45ab-9bff-9c946b59cf2e/linkset",
+  "totalItems": 2,
+  "items": [
+    { "id": "https://example.com/space/81246131-69a4-45ab-9bff-9c946b59cf2e/10f6672d-7a24-486b-9622-691007ded846" },
+    { "id": "https://example.com/space/81246131-69a4-45ab-9bff-9c946b59cf2e/b42ec4d8-6ead-486d-b70a-c25d2ce4dfc7" }
+  ]
+}
+```
+
 ### List Spaces Operation
+
+Lists spaces for in a given server.
 
 * Requires appropriate authorization (root zcap invoked by the controller of one
   or more spaces, or a zcap granting permission to read a one or more spaces)
