@@ -543,24 +543,12 @@ authorization as it would for a missing/not found space.
 
 ```http
 HTTP/1.1 404 Not Found
-Content-type: application/problem+json
-
-{
-  "type": "https://wallet.storage/spec#read-space-errors",
-  "title": "Space not found or insufficient authorization."
-}
 ```
 
 Example error response (space id not found):
 
 ```http
 HTTP/1.1 404 Not Found
-Content-type: application/problem+json
-
-{
-  "type": "https://wallet.storage/spec#read-space-errors",
-  "title": "Space not found or insufficient authorization."
-}
 ```
 
 ### List Spaces Operation
