@@ -1,3 +1,7 @@
+<section id="abstract">
+Wallet Attached Storage is a system enabling the distributed storage of data spaces and objects from any digital wallet.
+</section>
+
 ## Introduction
 
 The Wallet Attached Storage (WAS) specification brings together the lessons
